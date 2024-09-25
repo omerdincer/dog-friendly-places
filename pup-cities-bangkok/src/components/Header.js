@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai'; // For the hamburger icon
 import { FaInstagram } from 'react-icons/fa';  // For the Instagram logo
-import LoginPopup from './LoginPopup.js';  // Import LoginPopup component
+import { Link } from 'react-router-dom';  // Import Link from react-router-dom
+import LoginPopup from './LoginPopup';  // Import LoginPopup component
+import SignUpPopup from './SignUpPopup';  // Import SignUpPopup component
+import { auth } from '../firebase';  // Firebase auth
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isLoginOpen, setLoginOpen] = useState(false);  // For login popup
+  const [isLoginOpen, setLoginOpen] = useState(false);
+  const [isSignUpOpen, setSignUpOpen] = useState(false);  // For the Sign Up popup
+  const [userRole, setUserRole] = useState(null);  // Track user role
+  const [successMessage, setSuccessMessage] = useState('');  // Track success messages
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -13,6 +19,25 @@ const Header = () => {
 
   const toggleLoginPopup = () => {
     setLoginOpen(!isLoginOpen);  // Toggle login popup
+  };
+
+  const toggleSignUpPopup = () => {
+    setSignUpOpen(!isSignUpOpen);  // Toggle sign-up popup
+  };
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    setUserRole(null);  // Reset role on logout
+  };
+
+  // Callback for handling successful sign-up
+  const handleSignUpSuccess = (message) => {
+    setSuccessMessage(message);  // Set success message
+  };
+
+  // Function to dismiss the success message
+  const dismissSuccessMessage = () => {
+    setSuccessMessage('');  // Clear the success message
   };
 
   return (
@@ -41,15 +66,47 @@ const Header = () => {
             Close
           </button>
           <ul>
-            <li className="mb-2">Home</li>
-            <li className="mb-2 cursor-pointer" onClick={toggleLoginPopup}>Login</li> {/* Open Login Popup */}
-            <li className="mb-2">Sign up</li>
+            {/* Home Link */}
+            <li className="mb-2">
+              <Link to="/" onClick={toggleSidebar}>Home</Link>  {/* Link to home page */}
+            </li>
+
+            {/* Conditionally render links based on user role */}
+            {userRole === 'admin' && <li className="mb-2"><Link to="/admin" onClick={toggleSidebar}>Admin Panel</Link></li>}
+            {userRole === 'user' && <li className="mb-2"><Link to="/dashboard" onClick={toggleSidebar}>User Dashboard</Link></li>}
+
+            {/* Show Login/Logout based on authentication status */}
+            {userRole ? (
+              <li className="mb-2 cursor-pointer" onClick={handleLogout}>Logout</li>
+            ) : (
+              <>
+                <li className="mb-2 cursor-pointer" onClick={toggleLoginPopup}>Login</li>
+                <li className="mb-2 cursor-pointer" onClick={toggleSignUpPopup}>Sign Up</li>  {/* New Sign-Up Button */}
+              </>
+            )}
           </ul>
         </div>
       )}
 
+      {/* Success Message (after popup closes) */}
+      {successMessage && (
+        <div className="p-4 bg-green-500 text-white text-center relative mx-auto max-w-4xl">
+          {successMessage}
+          {/* Close button */}
+          <button
+            onClick={dismissSuccessMessage}
+            className="absolute top-0 right-0 p-2 text-xl text-white"
+          >
+            &times; {/* X symbol for closing */}
+          </button>
+        </div>
+      )}
+
       {/* Login Popup */}
-      {isLoginOpen && <LoginPopup closePopup={toggleLoginPopup} />} {/* Show popup */}
+      {isLoginOpen && <LoginPopup closePopup={toggleLoginPopup} setUserRole={setUserRole} />} 
+
+      {/* Sign Up Popup */}
+      {isSignUpOpen && <SignUpPopup closePopup={toggleSignUpPopup} onSignUpSuccess={handleSignUpSuccess} />}  {/* Show Sign-Up Popup */}
     </>
   );
 };
