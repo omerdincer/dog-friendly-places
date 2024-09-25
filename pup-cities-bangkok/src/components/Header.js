@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai'; // For the hamburger icon
 import { FaInstagram } from 'react-icons/fa';  // For the Instagram logo
 import { Link } from 'react-router-dom';  // Import Link from react-router-dom
@@ -35,10 +35,21 @@ const Header = () => {
     setSuccessMessage(message);  // Set success message
   };
 
-  // Function to dismiss the success message
+  // Function to dismiss the success message manually
   const dismissSuccessMessage = () => {
     setSuccessMessage('');  // Clear the success message
   };
+
+  // Automatically dismiss success message after 8 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');  // Clear the success message after 8 seconds
+      }, 8000);  // 8000 milliseconds = 8 seconds
+
+      return () => clearTimeout(timer);  // Clear the timeout if component unmounts or message changes
+    }
+  }, [successMessage]);
 
   return (
     <>
