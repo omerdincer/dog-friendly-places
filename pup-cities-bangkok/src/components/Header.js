@@ -4,7 +4,9 @@ import { FaInstagram } from 'react-icons/fa';  // For the Instagram logo
 import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import LoginPopup from './LoginPopup';  // Import LoginPopup component
 import SignUpPopup from './SignUpPopup';  // Import SignUpPopup component
-import { auth } from '../firebase';  // Firebase auth
+import { auth, db } from '../firebase';  // Firebase auth and firestore
+import { onAuthStateChanged } from 'firebase/auth';  // Listen to auth state changes
+import { getDoc, doc } from 'firebase/firestore';  // Firestore functions
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -29,6 +31,26 @@ const Header = () => {
     await auth.signOut();
     setUserRole(null);  // Reset role on logout
   };
+
+  // Automatically check if the user is logged in on component mount
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Fetch the user's role from Firestore
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          setUserRole(userSnap.data().role);
+        }
+      } else {
+        setUserRole(null);  // No user is signed in
+      }
+    });
+
+    // Clean up the listener on unmount
+    return () => unsubscribe();
+  }, []);
 
   // Callback for handling successful sign-up
   const handleSignUpSuccess = (message) => {
