@@ -32,7 +32,12 @@ const Header = () => {
 
   // Callback for handling successful sign-up
   const handleSignUpSuccess = (message) => {
-    setSuccessMessage(message);  // Set success message
+    setSuccessMessage(message);  // Set success message for sign-up
+  };
+
+  // Callback for handling successful login
+  const handleLoginSuccess = (message) => {
+    setSuccessMessage(message);  // Set success message for login
   };
 
   // Function to dismiss the success message manually
@@ -40,12 +45,12 @@ const Header = () => {
     setSuccessMessage('');  // Clear the success message
   };
 
-  // Automatically dismiss success message after 8 seconds
+  // Automatically dismiss success message after 6 seconds
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => {
-        setSuccessMessage('');  // Clear the success message after 8 seconds
-      }, 8000);  // 8000 milliseconds = 8 seconds
+        setSuccessMessage('');  // Clear the success message after 6 seconds
+      }, 6000);  // 6000 milliseconds = 6 seconds
 
       return () => clearTimeout(timer);  // Clear the timeout if component unmounts or message changes
     }
@@ -114,7 +119,7 @@ const Header = () => {
       )}
 
       {/* Login Popup */}
-      {isLoginOpen && <LoginPopup closePopup={toggleLoginPopup} setUserRole={setUserRole} />} 
+      {isLoginOpen && <LoginPopup closePopup={toggleLoginPopup} setUserRole={setUserRole} onLoginSuccess={handleLoginSuccess} />} 
 
       {/* Sign Up Popup */}
       {isSignUpOpen && <SignUpPopup closePopup={toggleSignUpPopup} onSignUpSuccess={handleSignUpSuccess} />}  {/* Show Sign-Up Popup */}

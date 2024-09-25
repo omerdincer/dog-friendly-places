@@ -3,7 +3,7 @@ import { auth, db } from '../firebase';  // Firebase setup
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { getDoc, doc } from 'firebase/firestore';  // Import getDoc and doc
 
-const LoginPopup = ({ closePopup, setUserRole }) => {
+const LoginPopup = ({ closePopup, setUserRole, onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -21,6 +21,9 @@ const LoginPopup = ({ closePopup, setUserRole }) => {
         const role = userSnap.data().role;
         setUserRole(role);  // Set the role in parent state
       }
+
+      // Pass success message to parent component
+      onLoginSuccess('Login successful! Welcome back!');
 
       closePopup();  // Close the popup after successful login
     } catch (error) {
@@ -40,6 +43,7 @@ const LoginPopup = ({ closePopup, setUserRole }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full mb-4 p-2 border rounded"
+            required
           />
           <input
             type="password"
@@ -47,6 +51,7 @@ const LoginPopup = ({ closePopup, setUserRole }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full mb-4 p-2 border rounded"
+            required
           />
           <button type="submit" className="bg-blue-500 text-white w-full p-2 rounded">
             Login
