@@ -1,6 +1,7 @@
 import Header from '../components/Header';
 import UserManagement from '../components/UserManagement';
-import LocationForm from '../components/LocationForm'; // Import the new LocationForm component
+import LocationForm from '../components/LocationForm';
+import FilterManagement from '../components/FilterManagement'; // Import the FilterManagement component
 
 const AdminPanel = () => {
   return (
@@ -10,13 +11,16 @@ const AdminPanel = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-4xl font-bold mb-4 text-center">Admin Panel</h1>
 
-        {/* Two frames side by side */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Three frames side by side */}
+        <div className="grid grid-cols-3 gap-4">
           {/* Add Location Form */}
-          <LocationForm /> {/* Include the LocationForm component */}
+          <LocationForm />
+
+          {/* Filter Management */}
+          <FilterManagement /> {/* Include the FilterManagement component */}
 
           {/* User Management */}
-          <UserManagement /> {/* Include the UserManagement component */}
+          <UserManagement />
         </div>
       </div>
     </div>
