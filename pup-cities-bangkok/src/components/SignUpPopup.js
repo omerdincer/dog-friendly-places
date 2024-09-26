@@ -3,11 +3,11 @@ import { auth, db } from '../firebase';  // Import Firebase authentication and F
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';  // For Firestore document creation
 
-const SignUpPopup = ({ closePopup, onSignUpSuccess }) => {  // onSignUpSuccess callback for success handling
+const SignUpPopup = ({ closePopup, onSignUpSuccess }) => {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');  // For error message
-  const role = 'user';  // Default role as 'user'
+  const [errorMessage, setErrorMessage] = useState('');  
+  const role = 'user';  // Default role is 'user'
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -17,10 +17,11 @@ const SignUpPopup = ({ closePopup, onSignUpSuccess }) => {  // onSignUpSuccess c
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // After signing up, create a Firestore document with user's uid
+      // After signing up, create a Firestore document with user's uid and set status as 'active'
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
-        role: role,  // Default role is 'user'
+        role: role,  
+        status: 'active',  // Set status as 'active' when signing up
       });
 
       // Notify parent component that the sign-up was successful
