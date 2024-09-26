@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AiOutlineMenu } from 'react-icons/ai'; // For the hamburger icon
+import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'; // For the hamburger and close icons
 import { FaInstagram } from 'react-icons/fa';  // For the Instagram logo
 import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import LoginPopup from './LoginPopup';  // Import LoginPopup component
@@ -98,33 +98,46 @@ const Header = () => {
       </header>
 
       {/* Sidebar */}
-      {isSidebarOpen && (
-        <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg p-4">
-          <button onClick={toggleSidebar} className="text-right mb-4">
-            Close
-          </button>
-          <ul>
-            {/* Home Link */}
-            <li className="mb-2">
-              <Link to="/" onClick={toggleSidebar}>Home</Link>  {/* Link to home page */}
+      <div
+        className={`fixed top-0 right-0 h-full transition-transform transform ${
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        } w-64 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg z-50 p-6`}
+      >
+        <button onClick={toggleSidebar} className="absolute top-4 right-4 text-white text-2xl">
+          <AiOutlineClose />
+        </button>
+        <ul className="mt-12 space-y-6">
+          <li className="text-white font-semibold text-lg">
+            <Link to="/" onClick={toggleSidebar}>Home</Link>
+          </li>
+
+          {userRole === 'admin' && (
+            <li className="text-white font-semibold text-lg">
+              <Link to="/admin" onClick={toggleSidebar}>Admin Panel</Link>
             </li>
+          )}
+          {userRole === 'user' && (
+            <li className="text-white font-semibold text-lg">
+              <Link to="/dashboard" onClick={toggleSidebar}>User Dashboard</Link>
+            </li>
+          )}
 
-            {/* Conditionally render links based on user role */}
-            {userRole === 'admin' && <li className="mb-2"><Link to="/admin" onClick={toggleSidebar}>Admin Panel</Link></li>}
-            {userRole === 'user' && <li className="mb-2"><Link to="/dashboard" onClick={toggleSidebar}>User Dashboard</Link></li>}
-
-            {/* Show Login/Logout based on authentication status */}
-            {userRole ? (
-              <li className="mb-2 cursor-pointer" onClick={handleLogout}>Logout</li>
-            ) : (
-              <>
-                <li className="mb-2 cursor-pointer" onClick={toggleLoginPopup}>Login</li>
-                <li className="mb-2 cursor-pointer" onClick={toggleSignUpPopup}>Sign Up</li>  {/* New Sign-Up Button */}
-              </>
-            )}
-          </ul>
-        </div>
-      )}
+          {userRole ? (
+            <li className="text-red-500 font-semibold text-lg cursor-pointer" onClick={handleLogout}>
+              Logout
+            </li>
+          ) : (
+            <>
+              <li className="text-white font-semibold text-lg cursor-pointer" onClick={toggleLoginPopup}>
+                Login
+              </li>
+              <li className="text-white font-semibold text-lg cursor-pointer" onClick={toggleSignUpPopup}>
+                Sign Up
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
 
       {/* Success Message (after popup closes) */}
       {successMessage && (
@@ -135,7 +148,7 @@ const Header = () => {
             onClick={dismissSuccessMessage}
             className="absolute top-0 right-0 p-2 text-xl text-white"
           >
-            &times; {/* X symbol for closing */}
+            &times;
           </button>
         </div>
       )}
@@ -144,7 +157,7 @@ const Header = () => {
       {isLoginOpen && <LoginPopup closePopup={toggleLoginPopup} setUserRole={setUserRole} onLoginSuccess={handleLoginSuccess} />} 
 
       {/* Sign Up Popup */}
-      {isSignUpOpen && <SignUpPopup closePopup={toggleSignUpPopup} onSignUpSuccess={handleSignUpSuccess} />}  {/* Show Sign-Up Popup */}
+      {isSignUpOpen && <SignUpPopup closePopup={toggleSignUpPopup} onSignUpSuccess={handleSignUpSuccess} />}  
     </>
   );
 };
