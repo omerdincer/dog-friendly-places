@@ -198,23 +198,30 @@ const AdminPanel = () => {
             </button>
           </form>
 
-          {/* User List in Grid */}
+          {/* User List in Table */}
           <h3 className="text-xl font-bold mb-2">Current Users</h3>
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-4 gap-4 mb-4">
             <div className="font-bold">Email</div>
             <div className="font-bold">Role</div>
             <div className="font-bold">Status</div>
+            <div className="font-bold">Action</div>
 
             {currentUsers.map(user => (
-              <div
-                key={user.id}
-                onClick={() => setSelectedUser(user)}  // Set selected user on row click
-                className={`border p-4 rounded cursor-pointer ${selectedUser && selectedUser.id === user.id ? 'bg-gray-200' : ''}`}
-              >
-                <div>{user.email}</div>
-                <div>{user.role}</div>
-                <div>{user.status ? 'Active' : 'Inactive'}</div>
-              </div>
+              <>
+                <div key={user.id} className="p-2 border-b">
+                  {user.email}
+                </div>
+                <div className="p-2 border-b">{user.role}</div>
+                <div className="p-2 border-b">{user.status ? 'Active' : 'Inactive'}</div>
+                <div className="p-2 border-b">
+                  <button
+                    onClick={() => setSelectedUser(user)}  // Set selected user on row click
+                    className="bg-blue-500 text-white p-1 rounded"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </>
             ))}
           </div>
 
