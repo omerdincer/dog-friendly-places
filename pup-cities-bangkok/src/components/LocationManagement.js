@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
 
 const LocationManagement = () => {
   // Location states
@@ -13,26 +13,25 @@ const LocationManagement = () => {
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
 
-  // Fetch neighborhoods and types from Firebase
+  // Real-time updates for neighborhoods and types
   useEffect(() => {
-    const fetchFilters = async () => {
-      try {
-        const neighborhoodsDoc = await getDoc(doc(db, 'filters', 'neighborhoods'));
-        const typesDoc = await getDoc(doc(db, 'filters', 'types'));
-
-        if (neighborhoodsDoc.exists()) {
-          setNeighborhoods(neighborhoodsDoc.data().values);
-        }
-
-        if (typesDoc.exists()) {
-          setTypes(typesDoc.data().values);
-        }
-      } catch (error) {
-        console.error('Error fetching filter options:', error);
+    const unsubscribeNeighborhoods = onSnapshot(doc(db, 'filters', 'neighborhoods'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        setNeighborhoods(docSnapshot.data().values);
       }
-    };
+    });
 
-    fetchFilters();
+    const unsubscribeTypes = onSnapshot(doc(db, 'filters', 'types'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        setTypes(docSnapshot.data().values);
+      }
+    });
+
+    // Cleanup listener on unmount
+    return () => {
+      unsubscribeNeighborhoods();
+      unsubscribeTypes();
+    };
   }, []);
 
   // Add new location
