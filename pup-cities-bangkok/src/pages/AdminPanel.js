@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import Header from '../components/Header';  // Assuming you have the Header component
+import Header from '../components/Header';
 
 const AdminPanel = () => {
   // Location states
@@ -13,7 +13,9 @@ const AdminPanel = () => {
   // User management states
   const [users, setUsers] = useState([]);
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserRole, setNewUserRole] = useState('user'); // Default role is 'user'
+  const [newUserRole, setNewUserRole] = useState('user'); 
+  const [currentPage, setCurrentPage] = useState(0); // Pagination state
+  const usersPerPage = 5; // Users per page
 
   // Fetch users from Firestore on component mount
   useEffect(() => {
@@ -36,7 +38,7 @@ const AdminPanel = () => {
         sponsored,
       });
       alert('Location added successfully!');
-      setName(''); // Clear input fields after adding
+      setName('');
       setNeighborhood('');
       setType('');
       setSponsored(false);
@@ -54,8 +56,8 @@ const AdminPanel = () => {
         status: true  // Set the initial status as true (active)
       });
       alert('User added successfully!');
-      setNewUserEmail(''); // Clear input fields
-      setNewUserRole('user'); // Reset role
+      setNewUserEmail('');
+      setNewUserRole('user');
     } catch (error) {
       console.error('Error adding user:', error);
     }
@@ -86,20 +88,34 @@ const AdminPanel = () => {
     try {
       await deleteDoc(doc(db, 'users', userId));
       alert('User deleted successfully!');
-      setUsers(users.filter(user => user.id !== userId)); // Remove from local state
+      setUsers(users.filter(user => user.id !== userId));
     } catch (error) {
       console.error('Error deleting user:', error);
     }
   };
 
+  // Pagination Logic
+  const indexOfLastUser = (currentPage + 1) * usersPerPage;
+  const indexOfFirstUser = currentPage * usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const nextPage = () => {
+    if ((currentPage + 1) * usersPerPage < users.length) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div>
-      {/* Adding the header to match the Home page design */}
       <Header /> 
 
-      {/* Main container */}
       <div className="container mx-auto p-4">
-        {/* Admin Panel Title */}
         <h1 className="text-4xl font-bold mb-4 text-center">Admin Panel</h1>
 
         {/* Add Location Form */}
@@ -174,11 +190,11 @@ const AdminPanel = () => {
             </button>
           </form>
 
-          {/* User List */}
+          {/* User List in Grid */}
           <h3 className="text-xl font-bold mb-2">Current Users</h3>
-          <ul>
-            {users.map(user => (
-              <li key={user.id} className="mb-4 border p-4 rounded shadow">
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {currentUsers.map(user => (
+              <div key={user.id} className="border p-4 rounded shadow">
                 <p>Email: {user.email}</p>
                 <p>Role: {user.role}</p>
                 <p>Status: {user.status ? 'Active' : 'Inactive'}</p>
@@ -202,9 +218,27 @@ const AdminPanel = () => {
                     Delete
                   </button>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
+
+          {/* Pagination Buttons */}
+          <div className="flex justify-between mt-4">
+            <button 
+              onClick={prevPage} 
+              className="bg-gray-300 p-2 rounded hover:bg-gray-400" 
+              disabled={currentPage === 0}
+            >
+              Previous
+            </button>
+            <button 
+              onClick={nextPage} 
+              className="bg-gray-300 p-2 rounded hover:bg-gray-400" 
+              disabled={indexOfLastUser >= users.length}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
