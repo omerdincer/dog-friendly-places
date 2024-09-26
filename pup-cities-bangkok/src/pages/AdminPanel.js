@@ -134,158 +134,161 @@ const AdminPanel = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-4xl font-bold mb-4 text-center">Admin Panel</h1>
 
-        {/* Add Location Form */}
-        <div className="max-w-lg mx-auto mb-10">
-          <h2 className="text-2xl font-bold mb-4">Add New Location</h2>
-          <form onSubmit={(e) => e.preventDefault()} className="mb-6">
-            <input
-              type="text"
-              placeholder="Location Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
-            />
-            <input
-              type="text"
-              placeholder="Neighborhood"
-              value={neighborhood}
-              onChange={(e) => setNeighborhood(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
-            />
-            <input
-              type="text"
-              placeholder="Type (Cafe, Park, etc.)"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
-            />
-            <label className="flex items-center mb-4">
+        {/* Two frames side by side */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Add Location Form */}
+          <div className="p-6 bg-gray-100 shadow-lg rounded">
+            <h2 className="text-2xl font-bold mb-4">Add New Location</h2>
+            <form onSubmit={(e) => e.preventDefault()} className="mb-6">
               <input
-                type="checkbox"
-                checked={sponsored}
-                onChange={() => setSponsored(!sponsored)}
-                className="mr-2"
+                type="text"
+                placeholder="Location Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full mb-4 p-2 border rounded"
               />
-              Sponsored
-            </label>
-            <button
-              onClick={handleAddLocation}
-              className="bg-blue-500 text-white w-full p-2 rounded hover:bg-blue-600 transition"
-            >
-              Add Location
-            </button>
-          </form>
-        </div>
-
-        {/* User Management */}
-        <div className="max-w-lg mx-auto">
-          <h2 className="text-2xl font-bold mb-4">User Management</h2>
-
-          {/* Add New User */}
-          <form onSubmit={(e) => e.preventDefault()} className="mb-6">
-            <input
-              type="email"
-              placeholder="New User Email"
-              value={newUserEmail}
-              onChange={(e) => setNewUserEmail(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
-            />
-            <select
-              value={newUserRole}
-              onChange={(e) => setNewUserRole(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-            <button
-              onClick={handleAddUser}
-              className="bg-green-500 text-white w-full p-2 rounded hover:bg-green-600 transition"
-            >
-              Add User
-            </button>
-          </form>
-
-          {/* User List in Table */}
-          <h3 className="text-xl font-bold mb-2">Current Users</h3>
-          <div className="grid grid-cols-4 gap-4 mb-4">
-            <div className="font-bold">Email</div>
-            <div className="font-bold">Role</div>
-            <div className="font-bold">Status</div>
-            <div className="font-bold">Action</div>
-
-            {currentUsers.map(user => (
-              <>
-                <div key={user.id} className="p-2 border-b">
-                  {user.email}
-                </div>
-                <div className="p-2 border-b">{user.role}</div>
-                <div className="p-2 border-b">{user.status ? 'Active' : 'Inactive'}</div>
-                <div className="p-2 border-b">
-                  <button
-                    onClick={() => setSelectedUser(user)}  // Set selected user on row click
-                    className="bg-blue-500 text-white p-1 rounded"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </>
-            ))}
+              <input
+                type="text"
+                placeholder="Neighborhood"
+                value={neighborhood}
+                onChange={(e) => setNeighborhood(e.target.value)}
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <input
+                type="text"
+                placeholder="Type (Cafe, Park, etc.)"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <label className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  checked={sponsored}
+                  onChange={() => setSponsored(!sponsored)}
+                  className="mr-2"
+                />
+                Sponsored
+              </label>
+              <button
+                onClick={handleAddLocation}
+                className="bg-blue-500 text-white w-full p-2 rounded hover:bg-blue-600 transition"
+              >
+                Add Location
+              </button>
+            </form>
           </div>
 
-          {/* Pagination Buttons */}
-          <div className="flex justify-between mt-4">
-            <button
-              onClick={prevPage}
-              className="bg-gray-300 p-2 rounded hover:bg-gray-400"
-              disabled={currentPage === 0}
-            >
-              Previous
-            </button>
-            <button
-              onClick={nextPage}
-              className="bg-gray-300 p-2 rounded hover:bg-gray-400"
-              disabled={indexOfLastUser >= users.length}
-            >
-              Next
-            </button>
-          </div>
+          {/* User Management */}
+          <div className="p-6 bg-gray-100 shadow-lg rounded">
+            <h2 className="text-2xl font-bold mb-4">User Management</h2>
 
-          {/* User Management Section */}
-          {selectedUser && (
-            <div ref={userManagementRef} className="mt-8 p-4 border-t">
-              <h3 className="text-2xl font-bold mb-4">Manage User: {selectedUser.email}</h3>
-              <div className="mb-4">
-                <label>Role:</label>
-                <select
-                  value={selectedUser.role}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
-                  className="w-full mb-4 p-2 border rounded"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <button
-                onClick={handleUpdateUser}
-                className="bg-yellow-500 text-white w-full p-2 rounded hover:bg-yellow-600 transition"
+            {/* Add New User */}
+            <form onSubmit={(e) => e.preventDefault()} className="mb-6">
+              <input
+                type="email"
+                placeholder="New User Email"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <select
+                value={newUserRole}
+                onChange={(e) => setNewUserRole(e.target.value)}
+                className="w-full mb-4 p-2 border rounded"
               >
-                Update Role
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+              <button
+                onClick={handleAddUser}
+                className="bg-green-500 text-white w-full p-2 rounded hover:bg-green-600 transition"
+              >
+                Add User
+              </button>
+            </form>
+
+            {/* User List in Table */}
+            <h3 className="text-xl font-bold mb-2">Current Users</h3>
+            <div className="grid grid-cols-4 gap-4 mb-4">
+              <div className="font-bold">Email</div>
+              <div className="font-bold">Role</div>
+              <div className="font-bold">Status</div>
+              <div className="font-bold">Action</div>
+
+              {currentUsers.map(user => (
+                <>
+                  <div key={user.id} className="p-2 border-b">
+                    {user.email}
+                  </div>
+                  <div className="p-2 border-b">{user.role}</div>
+                  <div className="p-2 border-b">{user.status ? 'Active' : 'Inactive'}</div>
+                  <div className="p-2 border-b">
+                    <button
+                      onClick={() => setSelectedUser(user)}  // Set selected user on row click
+                      className="bg-blue-500 text-white p-1 rounded"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </>
+              ))}
+            </div>
+
+            {/* Pagination Buttons */}
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={prevPage}
+                className="bg-gray-300 p-2 rounded hover:bg-gray-400"
+                disabled={currentPage === 0}
+              >
+                Previous
               </button>
               <button
-                onClick={handleDeactivateUser}
-                className="bg-red-500 text-white w-full p-2 rounded hover:bg-red-600 transition mt-4"
+                onClick={nextPage}
+                className="bg-gray-300 p-2 rounded hover:bg-gray-400"
+                disabled={indexOfLastUser >= users.length}
               >
-                Deactivate User
-              </button>
-              <button
-                onClick={handleDeleteUser}
-                className="bg-gray-500 text-white w-full p-2 rounded hover:bg-gray-600 transition mt-4"
-              >
-                Delete User
+                Next
               </button>
             </div>
-          )}
+
+            {/* User Management Section */}
+            {selectedUser && (
+              <div ref={userManagementRef} className="mt-8 p-4 border-t">
+                <h3 className="text-2xl font-bold mb-4">Manage User: {selectedUser.email}</h3>
+                <div className="mb-4">
+                  <label>Role:</label>
+                  <select
+                    value={selectedUser.role}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
+                    className="w-full mb-4 p-2 border rounded"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button
+                  onClick={handleUpdateUser}
+                  className="bg-yellow-500 text-white w-full p-2 rounded hover:bg-yellow-600 transition"
+                >
+                  Update Role
+                </button>
+                <button
+                  onClick={handleDeactivateUser}
+                  className="bg-red-500 text-white w-full p-2 rounded hover:bg-red-600 transition mt-4"
+                >
+                  Deactivate User
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  className="bg-gray-500 text-white w-full p-2 rounded hover:bg-gray-600 transition mt-4"
+                >
+                  Delete User
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
