@@ -1,33 +1,29 @@
 import React, { useState } from 'react';
-import { auth, db } from '../firebase';  // Import Firebase authentication and Firestore
+import { auth, db } from '../firebase';  
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { setDoc, doc } from 'firebase/firestore';  // For Firestore document creation
+import { setDoc, doc } from 'firebase/firestore';  
 
 const SignUpPopup = ({ closePopup, onSignUpSuccess }) => {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');  
-  const role = 'user';  // Default role is 'user'
+  const role = 'user';  
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setErrorMessage('');  // Clear previous messages
+    setErrorMessage('');  
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // After signing up, create a Firestore document with user's uid and set status as 'active'
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         role: role,  
-        status: 'active',  // Set status as 'active' when signing up
+        status: true,  // Set status as true (active)
       });
 
-      // Notify parent component that the sign-up was successful
       onSignUpSuccess('Sign up successful! Welcome aboard!');
-      
-      // Close the popup
       closePopup();
     } catch (error) {
       console.error("Error signing up:", error);

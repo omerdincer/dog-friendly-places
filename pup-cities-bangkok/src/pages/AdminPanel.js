@@ -51,7 +51,7 @@ const AdminPanel = () => {
       await addDoc(collection(db, 'users'), {
         email: newUserEmail,
         role: newUserRole,
-        status: 'active' // Set the initial status as 'active'
+        status: true  // Set the initial status as true (active)
       });
       alert('User added successfully!');
       setNewUserEmail(''); // Clear input fields
@@ -60,7 +60,6 @@ const AdminPanel = () => {
       console.error('Error adding user:', error);
     }
   };
-
 
   // Update user role
   const handleUpdateUser = async (userId, newRole) => {
@@ -75,7 +74,7 @@ const AdminPanel = () => {
   // Deactivate user
   const handleDeactivateUser = async (userId) => {
     try {
-      await updateDoc(doc(db, 'users', userId), { active: false });
+      await updateDoc(doc(db, 'users', userId), { status: false });
       alert('User deactivated successfully!');
     } catch (error) {
       console.error('Error deactivating user:', error);
