@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import Header from '../components/Header';
@@ -17,6 +17,7 @@ const AdminPanel = () => {
   const [selectedUser, setSelectedUser] = useState(null); // Store selected user
   const [currentPage, setCurrentPage] = useState(0);
   const usersPerPage = 5;
+  const userManagementRef = useRef(null); // Ref for scrolling to user management section
 
   // Fetch users from Firestore on component mount
   useEffect(() => {
@@ -28,6 +29,13 @@ const AdminPanel = () => {
 
     fetchUsers();
   }, []);
+
+  // Scroll to the user management section when a user is selected
+  useEffect(() => {
+    if (selectedUser && userManagementRef.current) {
+      userManagementRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedUser]);  // This ensures scrolling happens after state is updated
 
   // Add new location
   const handleAddLocation = async () => {
@@ -54,7 +62,7 @@ const AdminPanel = () => {
       await addDoc(collection(db, 'users'), {
         email: newUserEmail,
         role: newUserRole,
-        status: true,
+        status: true, // Active by default
       });
       alert('User added successfully!');
       setNewUserEmail('');
@@ -95,7 +103,7 @@ const AdminPanel = () => {
         await deleteDoc(doc(db, 'users', selectedUser.id));
         alert('User deleted successfully!');
         setUsers(users.filter(user => user.id !== selectedUser.id));
-        setSelectedUser(null); // Clear selected user after deletion
+        setSelectedUser(null);
       } catch (error) {
         console.error('Error deleting user:', error);
       }
@@ -245,7 +253,7 @@ const AdminPanel = () => {
 
           {/* User Management Section */}
           {selectedUser && (
-            <div className="mt-8 p-4 border-t">
+            <div ref={userManagementRef} className="mt-8 p-4 border-t">
               <h3 className="text-2xl font-bold mb-4">Manage User: {selectedUser.email}</h3>
               <div className="mb-4">
                 <label>Role:</label>
