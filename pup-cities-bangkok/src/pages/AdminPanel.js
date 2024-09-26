@@ -1,6 +1,6 @@
 import Header from '../components/Header';
 import UserManagement from '../components/UserManagement';
-import LocationForm from '../components/LocationForm';
+import LocationManagement from '../components/LocationManagement';
 import FilterManagement from '../components/FilterManagement'; // Import the FilterManagement component
 
 const AdminPanel = () => {
@@ -14,7 +14,7 @@ const AdminPanel = () => {
         {/* Three frames side by side */}
         <div className="grid grid-cols-3 gap-4">
           {/* Add Location Form */}
-          <LocationForm />
+          <LocationManagement />
 
           {/* Filter Management */}
           <FilterManagement /> {/* Include the FilterManagement component */}
