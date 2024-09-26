@@ -1,16 +1,33 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { auth } from '../firebase'; // Correct the import path
+import { auth, db } from '../firebase';  // Import Firebase auth and Firestore
+import { doc, getDoc } from 'firebase/firestore';  // For Firestore document fetching
 
-const AuthRoute = ({ children }) => {
+const AuthRoute = ({ children, requiredRole }) => {
+  const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        window.location.href = '/login'; // Redirect to login page if not authenticated
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setUserRole(userData.role);
+        }
       }
+      setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
+
+  if (loading) return <div>Loading...</div>;
+
+  if (!auth.currentUser || userRole !== requiredRole) {
+    return <Navigate to="/login" />;
+  }
 
   return children;
 };

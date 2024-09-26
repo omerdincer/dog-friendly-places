@@ -2,15 +2,19 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AdminPanel from './pages/AdminPanel';
 import UserDashboard from './pages/UserDashboard';
 import HomePage from './pages/Home';
-import LoginPage from './pages/LoginPage'; // Import the newly created LoginPage
-import AuthRoute from './components/AuthRoute.js';  // Assuming you have the AuthRoute component
+import LoginPage from './pages/LoginPage'; // Import the LoginPage
+import AuthRoute from './components/AuthRoute';  // Assuming you have the AuthRoute component
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} /> {/* Use LoginPage here */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected Routes */}
+        {/* Only admins can access the AdminPanel */}
         <Route 
           path="/admin" 
           element={
@@ -19,7 +23,16 @@ function App() {
             </AuthRoute>
           } 
         />
-        <Route path="/dashboard" element={<UserDashboard />} />
+
+        {/* Any authenticated user can access the UserDashboard */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <AuthRoute requiredRole="user">  {/* Protect the dashboard */}
+              <UserDashboard />
+            </AuthRoute>
+          } 
+        />
       </Routes>
     </Router>
   );
