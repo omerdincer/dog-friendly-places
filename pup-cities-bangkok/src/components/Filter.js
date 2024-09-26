@@ -37,12 +37,12 @@ const Filter = ({ onFilterChange }) => {
   };
 
   return (
-    <div className="flex space-x-4 mb-4">
+    <div className="flex items-center space-x-4 mb-6">
       {/* Neighborhood Filter */}
       <select
         value={selectedNeighborhood}
         onChange={(e) => setSelectedNeighborhood(e.target.value)}
-        className="border border-gray-300 p-2 rounded"
+        className="p-3 w-48 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 transition duration-300 ease-in-out"
       >
         <option value="">All Neighborhoods</option>
         {neighborhoods.map((neighborhood) => (
@@ -56,7 +56,7 @@ const Filter = ({ onFilterChange }) => {
       <select
         value={selectedType}
         onChange={(e) => setSelectedType(e.target.value)}
-        className="border border-gray-300 p-2 rounded"
+        className="p-3 w-48 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 transition duration-300 ease-in-out"
       >
         <option value="">All Types</option>
         {types.map((type) => (
@@ -66,7 +66,10 @@ const Filter = ({ onFilterChange }) => {
         ))}
       </select>
 
-      <button onClick={handleFilterChange} className="bg-blue-500 text-white p-2 rounded">
+      <button
+        onClick={handleFilterChange}
+        className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+      >
         Apply Filters
       </button>
     </div>
