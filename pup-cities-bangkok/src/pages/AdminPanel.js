@@ -13,9 +13,10 @@ const AdminPanel = () => {
   // User management states
   const [users, setUsers] = useState([]);
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserRole, setNewUserRole] = useState('user'); 
-  const [currentPage, setCurrentPage] = useState(0); // Pagination state
-  const usersPerPage = 5; // Users per page
+  const [newUserRole, setNewUserRole] = useState('user');
+  const [selectedUser, setSelectedUser] = useState(null); // Store selected user
+  const [currentPage, setCurrentPage] = useState(0);
+  const usersPerPage = 5;
 
   // Fetch users from Firestore on component mount
   useEffect(() => {
@@ -53,7 +54,7 @@ const AdminPanel = () => {
       await addDoc(collection(db, 'users'), {
         email: newUserEmail,
         role: newUserRole,
-        status: true  // Set the initial status as true (active)
+        status: true,
       });
       alert('User added successfully!');
       setNewUserEmail('');
@@ -64,33 +65,40 @@ const AdminPanel = () => {
   };
 
   // Update user role
-  const handleUpdateUser = async (userId, newRole) => {
-    try {
-      await updateDoc(doc(db, 'users', userId), { role: newRole });
-      alert('User updated successfully!');
-    } catch (error) {
-      console.error('Error updating user:', error);
+  const handleUpdateUser = async () => {
+    if (selectedUser) {
+      try {
+        await updateDoc(doc(db, 'users', selectedUser.id), { role: selectedUser.role });
+        alert('User updated successfully!');
+      } catch (error) {
+        console.error('Error updating user:', error);
+      }
     }
   };
 
   // Deactivate user
-  const handleDeactivateUser = async (userId) => {
-    try {
-      await updateDoc(doc(db, 'users', userId), { status: false });
-      alert('User deactivated successfully!');
-    } catch (error) {
-      console.error('Error deactivating user:', error);
+  const handleDeactivateUser = async () => {
+    if (selectedUser) {
+      try {
+        await updateDoc(doc(db, 'users', selectedUser.id), { status: false });
+        alert('User deactivated successfully!');
+      } catch (error) {
+        console.error('Error deactivating user:', error);
+      }
     }
   };
 
   // Delete user
-  const handleDeleteUser = async (userId) => {
-    try {
-      await deleteDoc(doc(db, 'users', userId));
-      alert('User deleted successfully!');
-      setUsers(users.filter(user => user.id !== userId));
-    } catch (error) {
-      console.error('Error deleting user:', error);
+  const handleDeleteUser = async () => {
+    if (selectedUser) {
+      try {
+        await deleteDoc(doc(db, 'users', selectedUser.id));
+        alert('User deleted successfully!');
+        setUsers(users.filter(user => user.id !== selectedUser.id));
+        setSelectedUser(null); // Clear selected user after deletion
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
     }
   };
 
@@ -113,7 +121,7 @@ const AdminPanel = () => {
 
   return (
     <div>
-      <Header /> 
+      <Header />
 
       <div className="container mx-auto p-4">
         <h1 className="text-4xl font-bold mb-4 text-center">Admin Panel</h1>
@@ -192,53 +200,77 @@ const AdminPanel = () => {
 
           {/* User List in Grid */}
           <h3 className="text-xl font-bold mb-2">Current Users</h3>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="font-bold">Email</div>
+            <div className="font-bold">Role</div>
+            <div className="font-bold">Status</div>
+
             {currentUsers.map(user => (
-              <div key={user.id} className="border p-4 rounded shadow">
-                <p>Email: {user.email}</p>
-                <p>Role: {user.role}</p>
-                <p>Status: {user.status ? 'Active' : 'Inactive'}</p>
-                <div className="flex space-x-2 mt-4">
-                  <button
-                    onClick={() => handleUpdateUser(user.id, user.role === 'admin' ? 'user' : 'admin')}
-                    className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
-                  >
-                    Toggle Role
-                  </button>
-                  <button
-                    onClick={() => handleDeactivateUser(user.id)}
-                    className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
-                  >
-                    Deactivate
-                  </button>
-                  <button
-                    onClick={() => handleDeleteUser(user.id)}
-                    className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
+              <div
+                key={user.id}
+                onClick={() => setSelectedUser(user)}  // Set selected user on row click
+                className={`border p-4 rounded cursor-pointer ${selectedUser && selectedUser.id === user.id ? 'bg-gray-200' : ''}`}
+              >
+                <div>{user.email}</div>
+                <div>{user.role}</div>
+                <div>{user.status ? 'Active' : 'Inactive'}</div>
               </div>
             ))}
           </div>
 
           {/* Pagination Buttons */}
           <div className="flex justify-between mt-4">
-            <button 
-              onClick={prevPage} 
-              className="bg-gray-300 p-2 rounded hover:bg-gray-400" 
+            <button
+              onClick={prevPage}
+              className="bg-gray-300 p-2 rounded hover:bg-gray-400"
               disabled={currentPage === 0}
             >
               Previous
             </button>
-            <button 
-              onClick={nextPage} 
-              className="bg-gray-300 p-2 rounded hover:bg-gray-400" 
+            <button
+              onClick={nextPage}
+              className="bg-gray-300 p-2 rounded hover:bg-gray-400"
               disabled={indexOfLastUser >= users.length}
             >
               Next
             </button>
           </div>
+
+          {/* User Management Section */}
+          {selectedUser && (
+            <div className="mt-8 p-4 border-t">
+              <h3 className="text-2xl font-bold mb-4">Manage User: {selectedUser.email}</h3>
+              <div className="mb-4">
+                <label>Role:</label>
+                <select
+                  value={selectedUser.role}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
+                  className="w-full mb-4 p-2 border rounded"
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <button
+                onClick={handleUpdateUser}
+                className="bg-yellow-500 text-white w-full p-2 rounded hover:bg-yellow-600 transition"
+              >
+                Update Role
+              </button>
+              <button
+                onClick={handleDeactivateUser}
+                className="bg-red-500 text-white w-full p-2 rounded hover:bg-red-600 transition mt-4"
+              >
+                Deactivate User
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                className="bg-gray-500 text-white w-full p-2 rounded hover:bg-gray-600 transition mt-4"
+              >
+                Delete User
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
