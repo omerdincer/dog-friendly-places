@@ -11,6 +11,7 @@ const LocationManagement = () => {
   const [sponsored, setSponsored] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [progress, setProgress] = useState(0); // Track upload progress
+  const [progressText, setProgressText] = useState(''); // Text inside progress bar
 
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
@@ -67,7 +68,13 @@ const LocationManagement = () => {
             // Calculate upload progress
             const progressPercentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProgress(progressPercentage); // Update progress state
-            console.log(`Upload is ${progressPercentage}% done`);
+
+            // Update progress text based on the state of the upload
+            if (progressPercentage === 0) {
+              setProgressText('Started!');
+            } else if (progressPercentage === 100) {
+              setProgressText('Completed!');
+            }
           },
           (error) => reject(error),
           async () => {
@@ -91,6 +98,7 @@ const LocationManagement = () => {
 
     try {
       setProgress(0); // Reset progress bar
+      setProgressText('Started!'); // Show "Started!" text when button is clicked
 
       let imageURL = null;
       if (imageFile) {
@@ -112,6 +120,7 @@ const LocationManagement = () => {
       setSponsored(false);
       setImageFile(null);
       setProgress(100); // Set progress to 100% when location is added
+      setProgressText('Completed!'); // Show "Completed!" text when the upload is done
     } catch (error) {
       console.error('Error adding location:', error);
     }
@@ -173,11 +182,14 @@ const LocationManagement = () => {
         />
 
         {/* Dynamic progress bar */}
-        <div className="w-full bg-gray-300 rounded h-2.5 mb-4">
+        <div className="relative w-full bg-gray-300 rounded h-2.5 mb-4">
           <div
             className="bg-blue-500 h-2.5 rounded"
             style={{ width: `${progress}%` }}
           ></div>
+          <span className="absolute inset-0 flex justify-center items-center text-sm font-semibold text-white">
+            {progressText}
+          </span>
         </div>
 
         <button
