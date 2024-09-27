@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
 import { db, storage } from '../firebase';
 import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const LocationManagement = () => {
+  // Location states
   const [name, setName] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
-  const [image, setImage] = useState(null); // State for storing selected image file
-  const [imageURL, setImageURL] = useState(''); // State for storing image URL after upload
+  const [imageFile, setImageFile] = useState(null); // State to handle image file
 
+  // Filter options states
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
 
+  // Real-time updates for neighborhoods and types
   useEffect(() => {
     const unsubscribeNeighborhoods = onSnapshot(doc(db, 'filters', 'neighborhoods'), (docSnapshot) => {
       if (docSnapshot.exists()) {
@@ -27,65 +29,44 @@ const LocationManagement = () => {
       }
     });
 
+    // Cleanup listener on unmount
     return () => {
       unsubscribeNeighborhoods();
       unsubscribeTypes();
     };
   }, []);
 
-  // Function to handle image file selection
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-
-  // Function to upload image and get its download URL
-  const uploadImage = async () => {
-    if (!image) return;
-
-    const storageRef = ref(storage, `locations/${image.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, image);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        // Track the progress of the upload
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`Upload is ${progress}% done`);
-      },
-      (error) => {
-        console.error('Error uploading image:', error);
-      },
-      () => {
-        // Handle successful upload and get the download URL
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log('File available at:', downloadURL);
-          setImageURL(downloadURL); // Store the download URL in state
-        });
-      }
-    );
-  };
-
+  // Add new location
   const handleAddLocation = async () => {
-    try {
-      // Upload image first before adding location
-      await uploadImage();
-
-      await addDoc(collection(db, 'locations'), {
-        name,
-        neighborhood,
-        type,
-        sponsored,
-        imageURL, // Save image URL in Firestore
+    if (imageFile) {
+      const storageRef = ref(storage, `locations/${imageFile.name}`);
+      
+      // Upload image to Firebase Storage
+      uploadBytes(storageRef, imageFile).then((snapshot) => {
+        // Get the image download URL
+        getDownloadURL(snapshot.ref).then(async (downloadURL) => {
+          // Add location data along with the image URL
+          try {
+            await addDoc(collection(db, 'locations'), {
+              name,
+              neighborhood,
+              type,
+              sponsored,
+              imageURL: downloadURL // Save the image URL to Firestore
+            });
+            alert('Location added successfully!');
+            setName('');
+            setNeighborhood('');
+            setType('');
+            setSponsored(false);
+            setImageFile(null); // Reset the file input
+          } catch (error) {
+            console.error('Error adding location:', error);
+          }
+        });
       });
-      alert('Location added successfully!');
-      setName('');
-      setNeighborhood('');
-      setType('');
-      setSponsored(false);
-    } catch (error) {
-      console.error('Error adding location:', error);
+    } else {
+      alert('Please upload an image.');
     }
   };
 
@@ -101,6 +82,7 @@ const LocationManagement = () => {
           className="w-full mb-4 p-2 border rounded"
         />
 
+        {/* Neighborhood Dropdown */}
         <select
           value={neighborhood}
           onChange={(e) => setNeighborhood(e.target.value)}
@@ -114,6 +96,7 @@ const LocationManagement = () => {
           ))}
         </select>
 
+        {/* Type Dropdown */}
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
@@ -137,8 +120,12 @@ const LocationManagement = () => {
           Sponsored
         </label>
 
-        {/* Image Input */}
-        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full mb-4 p-2" />
+        {/* Image Upload */}
+        <input
+          type="file"
+          onChange={(e) => setImageFile(e.target.files[0])}
+          className="w-full mb-4 p-2 border rounded"
+        />
 
         <button
           onClick={handleAddLocation}
