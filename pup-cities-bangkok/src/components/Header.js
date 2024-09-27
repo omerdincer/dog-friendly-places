@@ -99,7 +99,7 @@ const Header = () => {
           />
 
           {/* Title with LE PETIT COCHON font */}
-          <h1 className="text-2xl font-bold le-petit-cochon text-white">Pup Cities Bangkok</h1> 
+          <h1 className="text-2xl font-bold le-petit-cochon" style={{ color: '#e7e0d8' }}>Pup Cities Bangkok</h1> 
         </div>
 
         {/* Hamburger Menu on the right */}
@@ -112,7 +112,7 @@ const Header = () => {
       <div
         className={`fixed top-0 right-0 h-full transition-transform transform ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
-        } w-64 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg z-50 p-6`}
+        } w-64 bg-custom-gray shadow-lg z-50 p-6`}
       >
         <button onClick={toggleSidebar} className="absolute top-4 right-4 text-white text-2xl">
           <AiOutlineClose />
