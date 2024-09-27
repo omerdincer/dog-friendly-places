@@ -10,7 +10,6 @@ const LocationManagement = () => {
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
   const [imageFile, setImageFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
 
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
@@ -163,6 +162,11 @@ const LocationManagement = () => {
           onChange={handleImageChange}
           className="mb-4"
         />
+
+        {/* Static progress bar */}
+        <div className="w-full bg-gray-300 rounded h-2.5 mb-4">
+          <div className="bg-blue-500 h-2.5 rounded" style={{ width: '100%' }}></div> {/* Full-width progress bar */}
+        </div>
 
         <button
           onClick={handleAddLocation}
