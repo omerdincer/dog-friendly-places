@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import React from 'react';
 
 const UserManagement = () => {
   // User management states
@@ -139,8 +140,8 @@ const UserManagement = () => {
         <div className="font-bold">Action</div>
 
         {currentUsers.map(user => (
-          <>
-            <div key={user.id} className="p-2 border-b">
+          <React.Fragment key={user.id}>
+            <div className="p-2 border-b">
               {user.email}
             </div>
             <div className="p-2 border-b">{user.role}</div>
@@ -153,7 +154,7 @@ const UserManagement = () => {
                 Edit
               </button>
             </div>
-          </>
+          </React.Fragment>
         ))}
       </div>
 

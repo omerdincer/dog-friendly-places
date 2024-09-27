@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { db } from '../firebase';
+import { db, storage } from '../firebase'; // Import Firebase Storage
 import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // For image upload
 
 const LocationManagement = () => {
   // Location states
@@ -8,6 +9,8 @@ const LocationManagement = () => {
   const [neighborhood, setNeighborhood] = useState('');
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
+  const [image, setImage] = useState(null); // State to store the selected image file
+  const [imageUrl, setImageUrl] = useState(''); // State to store the uploaded image URL
 
   // Filter options states
   const [neighborhoods, setNeighborhoods] = useState([]);
@@ -27,27 +30,47 @@ const LocationManagement = () => {
       }
     });
 
-    // Cleanup listener on unmount
     return () => {
       unsubscribeNeighborhoods();
       unsubscribeTypes();
     };
   }, []);
 
-  // Add new location
+  // Function to handle image upload
+  const handleImageUpload = async () => {
+    if (image) {
+      const imageRef = ref(storage, `locations/${image.name}`);
+      await uploadBytes(imageRef, image);
+      const url = await getDownloadURL(imageRef);
+      setImageUrl(url); // Set the image URL after upload
+    }
+  };
+
+  // Add new location with image
   const handleAddLocation = async () => {
     try {
+      // First, upload the image if one is selected
+      if (image) {
+        await handleImageUpload();
+      }
+
+      // Add the location document to Firestore, including the image URL
       await addDoc(collection(db, 'locations'), {
         name,
         neighborhood,
         type,
         sponsored,
+        imageUrl, // Include the image URL in the Firestore document
       });
+
       alert('Location added successfully!');
+      // Clear the form fields
       setName('');
       setNeighborhood('');
       setType('');
       setSponsored(false);
+      setImage(null); // Clear the image file input
+      setImageUrl(''); // Clear the image URL
     } catch (error) {
       console.error('Error adding location:', error);
     }
@@ -101,6 +124,16 @@ const LocationManagement = () => {
             className="mr-2"
           />
           Sponsored
+        </label>
+
+        {/* Image Upload */}
+        <label className="block mb-4">
+          <span className="text-gray-700">Upload Image</span>
+          <input
+            type="file"
+            onChange={(e) => setImage(e.target.files[0])}
+            className="w-full p-2 border rounded mt-2"
+          />
         </label>
 
         <button
