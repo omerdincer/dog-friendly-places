@@ -8,6 +8,9 @@ import { auth, db } from '../firebase';  // Firebase auth and firestore
 import { onAuthStateChanged } from 'firebase/auth';  // Listen to auth state changes
 import { getDoc, doc } from 'firebase/firestore';  // Firestore functions
 
+// Import your logo image
+import Logo from '../components/materials/logo.png'; // Adjust this path based on where your logo is
+
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
@@ -80,16 +83,18 @@ const Header = () => {
 
   return (
     <>
-      <header className="relative flex items-center justify-between p-6 bg-white shadow-md">
+      <header className="relative flex items-center justify-between p-4 bg-white shadow-md h-20">
         {/* Instagram Icon on the left */}
         <div className="absolute left-4 flex items-center space-x-2">
           <FaInstagram className="text-3xl" />
         </div>
 
-        {/* Centered Title */}
-        <h1 className="absolute inset-x-0 text-center text-2xl font-bold">
-          Pup Cities Bangkok
-        </h1>
+        {/* Centered Logo */}
+        <img
+          src={Logo}
+          alt="Pup Cities Bangkok Logo"
+          className="absolute inset-x-0 mx-auto h-full object-contain" // Adjust the height as needed
+        />
 
         {/* Hamburger Menu on the right */}
         <button onClick={toggleSidebar} className="absolute right-4 text-3xl">
