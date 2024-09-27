@@ -83,21 +83,27 @@ const Header = () => {
 
   return (
     <>
-      <header className="relative flex items-center justify-between p-4 bg-white shadow-md h-20">
+      <header className="relative flex items-center justify-between p-4" style={{ backgroundColor: '#4c6066' }}>
         {/* Instagram Icon on the left */}
         <div className="absolute left-4 flex items-center space-x-2">
-          <FaInstagram className="text-3xl" />
+          <FaInstagram className="text-3xl text-white" />
         </div>
 
-        {/* Centered Logo */}
-        <img
-          src={Logo}
-          alt="Pup Cities Bangkok Logo"
-          className="absolute inset-x-0 mx-auto h-full object-contain" // Adjust the height as needed
-        />
+        {/* Centered Logo and Title */}
+        <div className="flex items-center justify-center mx-auto space-x-4">
+          {/* Logo */}
+          <img
+            src={Logo}
+            alt="Pup Cities Bangkok Logo"
+            className="h-10 object-contain" // Adjust the height as needed
+          />
+
+          {/* Title with LE PETIT COCHON font */}
+          <h1 className="text-2xl font-bold le-petit-cochon text-white">Pup Cities Bangkok</h1> 
+        </div>
 
         {/* Hamburger Menu on the right */}
-        <button onClick={toggleSidebar} className="absolute right-4 text-3xl">
+        <button onClick={toggleSidebar} className="absolute right-4 text-3xl text-white">
           <AiOutlineMenu />
         </button>
       </header>
