@@ -117,7 +117,16 @@ const Header = () => {
         <button onClick={toggleSidebar} className="absolute top-4 right-4 text-white text-2xl">
           <AiOutlineClose />
         </button>
-        <ul className="mt-12 space-y-6">
+
+        {/* Empty space to match header size */}
+        <div className="h-20"></div>  {/* Adjust this height to match the header size */}
+
+        {/* Logo at the top of the sidebar */}
+        <div className="flex justify-start mb-6">
+          <img src={Logo} alt="Pup Cities Bangkok Logo" className="h-32 object-contain" />  {/* Adjust the height as needed */}
+        </div>
+
+        <ul className="space-y-6">
           <li className="text-custom-sidebar-text font-semibold text-2xl josefin-sans-semi-bold">
             <Link to="/" onClick={toggleSidebar}>Home</Link>
           </li>
