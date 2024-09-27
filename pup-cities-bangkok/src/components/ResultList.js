@@ -28,8 +28,8 @@ const ResultList = ({ filters }) => {
     .sort((a, b) => b.sponsored - a.sponsored); // Sort sponsored first
 
   return (
-    <div className="flex justify-center"> {/* This will center the results */}
-      <ul className="space-y-4 w-full max-w-md"> {/* Max-width ensures the content doesn't stretch too wide */}
+    <div className="flex justify-center">
+      <ul className="space-y-4 w-full max-w-md">
         {filteredLocations.map((location) => (
           <li
             key={location.id}
@@ -38,9 +38,9 @@ const ResultList = ({ filters }) => {
             }`}
           >
             <div className="flex items-center">
-              {/* Placeholder for location image */}
+              {/* Image from Firestore's imageURL field */}
               <img
-                src="../components/materials/dogpark.png" // Replace with your dynamic image logic if needed
+                src={location.imageURL || "../components/materials/default.png"} // Use default image if imageURL is missing
                 alt={location.name}
                 className="w-16 h-16 object-cover rounded-lg mr-4"
               />
