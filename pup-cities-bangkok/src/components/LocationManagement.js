@@ -1,22 +1,19 @@
 import { useState, useEffect } from 'react';
-import { db, storage } from '../firebase'; // Import Firebase Storage
+import { db, storage } from '../firebase';
 import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // For image upload
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 const LocationManagement = () => {
-  // Location states
   const [name, setName] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
-  const [image, setImage] = useState(null); // State to store the selected image file
-  const [imageUrl, setImageUrl] = useState(''); // State to store the uploaded image URL
+  const [image, setImage] = useState(null); // State for storing selected image file
+  const [imageURL, setImageURL] = useState(''); // State for storing image URL after upload
 
-  // Filter options states
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
 
-  // Real-time updates for neighborhoods and types
   useEffect(() => {
     const unsubscribeNeighborhoods = onSnapshot(doc(db, 'filters', 'neighborhoods'), (docSnapshot) => {
       if (docSnapshot.exists()) {
@@ -36,41 +33,57 @@ const LocationManagement = () => {
     };
   }, []);
 
-  // Function to handle image upload
-  const handleImageUpload = async () => {
-    if (image) {
-      const imageRef = ref(storage, `locations/${image.name}`);
-      await uploadBytes(imageRef, image);
-      const url = await getDownloadURL(imageRef);
-      setImageUrl(url); // Set the image URL after upload
+  // Function to handle image file selection
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
     }
   };
 
-  // Add new location with image
+  // Function to upload image and get its download URL
+  const uploadImage = async () => {
+    if (!image) return;
+
+    const storageRef = ref(storage, `locations/${image.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        // Track the progress of the upload
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        console.error('Error uploading image:', error);
+      },
+      () => {
+        // Handle successful upload and get the download URL
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log('File available at:', downloadURL);
+          setImageURL(downloadURL); // Store the download URL in state
+        });
+      }
+    );
+  };
+
   const handleAddLocation = async () => {
     try {
-      // First, upload the image if one is selected
-      if (image) {
-        await handleImageUpload();
-      }
+      // Upload image first before adding location
+      await uploadImage();
 
-      // Add the location document to Firestore, including the image URL
       await addDoc(collection(db, 'locations'), {
         name,
         neighborhood,
         type,
         sponsored,
-        imageUrl, // Include the image URL in the Firestore document
+        imageURL, // Save image URL in Firestore
       });
-
       alert('Location added successfully!');
-      // Clear the form fields
       setName('');
       setNeighborhood('');
       setType('');
       setSponsored(false);
-      setImage(null); // Clear the image file input
-      setImageUrl(''); // Clear the image URL
     } catch (error) {
       console.error('Error adding location:', error);
     }
@@ -88,7 +101,6 @@ const LocationManagement = () => {
           className="w-full mb-4 p-2 border rounded"
         />
 
-        {/* Neighborhood Dropdown */}
         <select
           value={neighborhood}
           onChange={(e) => setNeighborhood(e.target.value)}
@@ -102,7 +114,6 @@ const LocationManagement = () => {
           ))}
         </select>
 
-        {/* Type Dropdown */}
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
@@ -126,15 +137,8 @@ const LocationManagement = () => {
           Sponsored
         </label>
 
-        {/* Image Upload */}
-        <label className="block mb-4">
-          <span className="text-gray-700">Upload Image</span>
-          <input
-            type="file"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="w-full p-2 border rounded mt-2"
-          />
-        </label>
+        {/* Image Input */}
+        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full mb-4 p-2" />
 
         <button
           onClick={handleAddLocation}
