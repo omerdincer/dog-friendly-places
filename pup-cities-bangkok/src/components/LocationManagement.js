@@ -10,6 +10,7 @@ const LocationManagement = () => {
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [progress, setProgress] = useState(0); // Track upload progress
 
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
@@ -62,7 +63,12 @@ const LocationManagement = () => {
       return new Promise((resolve, reject) => {
         uploadTask.on(
           'state_changed',
-          null,
+          (snapshot) => {
+            // Calculate upload progress
+            const progressPercentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(progressPercentage); // Update progress state
+            console.log(`Upload is ${progressPercentage}% done`);
+          },
           (error) => reject(error),
           async () => {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -84,6 +90,8 @@ const LocationManagement = () => {
     }
 
     try {
+      setProgress(0); // Reset progress bar
+
       let imageURL = null;
       if (imageFile) {
         imageURL = await uploadImage(imageFile); // Upload and get the image URL
@@ -103,6 +111,7 @@ const LocationManagement = () => {
       setType('');
       setSponsored(false);
       setImageFile(null);
+      setProgress(100); // Set progress to 100% when location is added
     } catch (error) {
       console.error('Error adding location:', error);
     }
@@ -163,9 +172,12 @@ const LocationManagement = () => {
           className="mb-4"
         />
 
-        {/* Static progress bar */}
+        {/* Dynamic progress bar */}
         <div className="w-full bg-gray-300 rounded h-2.5 mb-4">
-          <div className="bg-blue-500 h-2.5 rounded" style={{ width: '100%' }}></div> {/* Full-width progress bar */}
+          <div
+            className="bg-blue-500 h-2.5 rounded"
+            style={{ width: `${progress}%` }}
+          ></div>
         </div>
 
         <button
