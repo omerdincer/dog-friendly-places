@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       colors: {
       'custom-gray': '#4c6066',
+      'custom-sidebar-text': '#93a492',
     },
   },
   },

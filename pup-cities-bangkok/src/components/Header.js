@@ -118,31 +118,40 @@ const Header = () => {
           <AiOutlineClose />
         </button>
         <ul className="mt-12 space-y-6">
-          <li className="text-white font-semibold text-lg">
+          <li className="text-custom-sidebar-text font-semibold text-2xl josefin-sans-semi-bold">
             <Link to="/" onClick={toggleSidebar}>Home</Link>
           </li>
 
           {userRole === 'admin' && (
-            <li className="text-white font-semibold text-lg">
+            <li className="text-custom-sidebar-text font-semibold text-2xl josefin-sans-semi-bold">
               <Link to="/admin" onClick={toggleSidebar}>Admin Panel</Link>
             </li>
           )}
           {userRole === 'user' && (
-            <li className="text-white font-semibold text-lg">
+            <li className="text-custom-sidebar-text font-semibold text-2xl josefin-sans-semi-bold">
               <Link to="/dashboard" onClick={toggleSidebar}>User Dashboard</Link>
             </li>
           )}
 
           {userRole ? (
-            <li className="text-red-500 font-semibold text-lg cursor-pointer" onClick={handleLogout}>
+            <li
+              className="text-red-500 font-semibold text-2xl cursor-pointer josefin-sans-semi-bold"
+              onClick={handleLogout}
+            >
               Logout
             </li>
           ) : (
             <>
-              <li className="text-white font-semibold text-lg cursor-pointer" onClick={toggleLoginPopup}>
+              <li
+                className="text-custom-sidebar-text font-semibold text-2xl cursor-pointer josefin-sans-semi-bold"
+                onClick={toggleLoginPopup}
+              >
                 Login
               </li>
-              <li className="text-white font-semibold text-lg cursor-pointer" onClick={toggleSignUpPopup}>
+              <li
+                className="text-custom-sidebar-text font-semibold text-2xl cursor-pointer josefin-sans-semi-bold"
+                onClick={toggleSignUpPopup}
+              >
                 Sign Up
               </li>
             </>
