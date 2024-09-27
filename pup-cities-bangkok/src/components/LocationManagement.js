@@ -1,21 +1,20 @@
 import { useState, useEffect } from 'react';
 import { db, storage } from '../firebase';
 import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import imageCompression from 'browser-image-compression';
 
 const LocationManagement = () => {
-  // Location states
   const [name, setName] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
-  const [imageFile, setImageFile] = useState(null); // State to handle image file
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
 
-  // Filter options states
   const [neighborhoods, setNeighborhoods] = useState([]);
   const [types, setTypes] = useState([]);
 
-  // Real-time updates for neighborhoods and types
   useEffect(() => {
     const unsubscribeNeighborhoods = onSnapshot(doc(db, 'filters', 'neighborhoods'), (docSnapshot) => {
       if (docSnapshot.exists()) {
@@ -29,44 +28,84 @@ const LocationManagement = () => {
       }
     });
 
-    // Cleanup listener on unmount
     return () => {
       unsubscribeNeighborhoods();
       unsubscribeTypes();
     };
   }, []);
 
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const validFormats = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!validFormats.includes(file.type)) {
+        alert('Only JPEG, JPG, and PNG formats are allowed.');
+        return;
+      }
+      setImageFile(file);
+    }
+  };
+
+  // Compress and upload the image to Firebase Storage
+  const uploadImage = async (file) => {
+    const options = {
+      maxSizeMB: 1, // Limit size to 1MB
+      maxWidthOrHeight: 360, // Resize to 360p
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      const storageRef = ref(storage, `locations/${compressedFile.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, compressedFile);
+
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          null,
+          (error) => reject(error),
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error compressing or uploading the image:', error);
+      return null;
+    }
+  };
+
   // Add new location
   const handleAddLocation = async () => {
-    if (imageFile) {
-      const storageRef = ref(storage, `locations/${imageFile.name}`);
-      
-      // Upload image to Firebase Storage
-      uploadBytes(storageRef, imageFile).then((snapshot) => {
-        // Get the image download URL
-        getDownloadURL(snapshot.ref).then(async (downloadURL) => {
-          // Add location data along with the image URL
-          try {
-            await addDoc(collection(db, 'locations'), {
-              name,
-              neighborhood,
-              type,
-              sponsored,
-              imageURL: downloadURL // Save the image URL to Firestore
-            });
-            alert('Location added successfully!');
-            setName('');
-            setNeighborhood('');
-            setType('');
-            setSponsored(false);
-            setImageFile(null); // Reset the file input
-          } catch (error) {
-            console.error('Error adding location:', error);
-          }
-        });
+    if (!name || !neighborhood || !type) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    try {
+      let imageURL = null;
+      if (imageFile) {
+        imageURL = await uploadImage(imageFile); // Upload and get the image URL
+      }
+
+      await addDoc(collection(db, 'locations'), {
+        name,
+        neighborhood,
+        type,
+        sponsored,
+        imageURL, // Store the image URL in Firestore
       });
-    } else {
-      alert('Please upload an image.');
+
+      alert('Location added successfully!');
+      setName('');
+      setNeighborhood('');
+      setType('');
+      setSponsored(false);
+      setImageFile(null);
+    } catch (error) {
+      console.error('Error adding location:', error);
     }
   };
 
@@ -82,7 +121,6 @@ const LocationManagement = () => {
           className="w-full mb-4 p-2 border rounded"
         />
 
-        {/* Neighborhood Dropdown */}
         <select
           value={neighborhood}
           onChange={(e) => setNeighborhood(e.target.value)}
@@ -96,7 +134,6 @@ const LocationManagement = () => {
           ))}
         </select>
 
-        {/* Type Dropdown */}
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
@@ -120,11 +157,11 @@ const LocationManagement = () => {
           Sponsored
         </label>
 
-        {/* Image Upload */}
         <input
           type="file"
-          onChange={(e) => setImageFile(e.target.files[0])}
-          className="w-full mb-4 p-2 border rounded"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="mb-4"
         />
 
         <button
