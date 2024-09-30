@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase"; // Import Firestore instance
 import { collection, getDocs } from "firebase/firestore";
+import { Link } from "react-router-dom"; // Import Link from React Router
 
 const ResultList = ({ filters }) => {
   const [locations, setLocations] = useState([]);
@@ -37,27 +38,31 @@ const ResultList = ({ filters }) => {
               location.sponsored ? "bg-pink-100" : "bg-[#e7e0d8]"
             }`}
           >
-            <div className="flex items-center">
-              {/* Image from Firestore's imageURL field */}
+            <Link
+              to={`/location/${location.id}`}
+              target="_blank" // Open in new tab
+              className="flex items-center"
+            >
               <img
-                src={location.imageURL || "../components/materials/default.png"} // Use default image if imageURL is missing
+                src={location.imageURL || "../components/materials/default.png"}
                 alt={location.name}
                 className="w-16 h-16 object-cover rounded-lg mr-4"
               />
               <div>
-                <h2 className="text-xl font-bold text-gray-800">{location.name}</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  {location.name}
+                </h2>
                 <p className="text-gray-600">
                   A {location.type} in {location.neighborhood}.
                 </p>
               </div>
 
-              {/* Sponsored Tag */}
               {location.sponsored && (
                 <span className="bg-pink-500 text-white px-3 py-1 rounded-full ml-auto">
                   Sponsored
                 </span>
               )}
-            </div>
+            </Link>
           </li>
         ))}
       </ul>
