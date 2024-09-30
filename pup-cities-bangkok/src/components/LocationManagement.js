@@ -10,6 +10,7 @@ const LocationManagement = () => {
   const [type, setType] = useState('');
   const [sponsored, setSponsored] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [googleMapsLink, setGoogleMapsLink] = useState(''); // New state for Google Maps link
   const [progress, setProgress] = useState(0); // Track upload progress
   const [progressText, setProgressText] = useState(''); // Text inside progress bar
 
@@ -65,16 +66,9 @@ const LocationManagement = () => {
         uploadTask.on(
           'state_changed',
           (snapshot) => {
-            // Calculate upload progress
             const progressPercentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProgress(progressPercentage); // Update progress state
-
-            // Update progress text based on the state of the upload
-            if (progressPercentage === 0) {
-              setProgressText('Started!');
-            } else if (progressPercentage === 100) {
-              setProgressText('Completed!');
-            }
+            setProgressText(progressPercentage === 100 ? 'Almost Completed!' : 'Started!');
           },
           (error) => reject(error),
           async () => {
@@ -91,7 +85,7 @@ const LocationManagement = () => {
 
   // Add new location
   const handleAddLocation = async () => {
-    if (!name || !neighborhood || !type) {
+    if (!name || !neighborhood || !type || !googleMapsLink) {
       alert('Please fill out all fields.');
       return;
     }
@@ -111,6 +105,7 @@ const LocationManagement = () => {
         type,
         sponsored,
         imageURL, // Store the image URL in Firestore
+        googleMapsLink, // Store the Google Maps link in Firestore
       });
 
       alert('Location added successfully!');
@@ -119,8 +114,9 @@ const LocationManagement = () => {
       setType('');
       setSponsored(false);
       setImageFile(null);
+      setGoogleMapsLink(''); // Reset Google Maps link
       setProgress(100); // Set progress to 100% when location is added
-      setProgressText('Completed!'); // Show "Completed!" text when the upload is done
+      setProgressText('Almost Completed!'); // Show "Completed!" text when the upload is done
     } catch (error) {
       console.error('Error adding location:', error);
     }
@@ -173,6 +169,14 @@ const LocationManagement = () => {
           />
           Sponsored
         </label>
+
+        <input
+          type="text"
+          placeholder="Google Maps Link"
+          value={googleMapsLink}
+          onChange={(e) => setGoogleMapsLink(e.target.value)}
+          className="w-full mb-4 p-2 border rounded"
+        />
 
         <input
           type="file"
