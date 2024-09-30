@@ -33,14 +33,14 @@ const LocationDetail = () => {
       {/* Add the Header at the top */}
       <Header />
 
-      {/* Main content container */}
+      {/* Centering the content like the homepage */}
       <div className="container mx-auto p-4">
-        <div className="bg-white p-6 shadow-lg rounded-lg">
+        <div className="w-full max-w-3xl mx-auto bg-white p-6 shadow-lg rounded-lg">
           {/* Location Image */}
           <img
             src={location.imageURL || "../components/materials/default.png"}
             alt={location.name}
-            className="w-full h-96 object-cover rounded-lg mb-6"
+            className="w-full h-72 object-cover rounded-lg mb-6"
           />
 
           {/* Location Name and Social Icons */}
@@ -61,45 +61,43 @@ const LocationDetail = () => {
 
           {/* Google Maps Link */}
           {location.googleMapsLink && (
-            <div className="mb-6 w-full">
+            <div className="mb-6">
               <div
-                className="w-full"
-                dangerouslySetInnerHTML={{
-                  __html: location.googleMapsLink.replace(
-                    'height="450"',
-                    'height="100%"'
-                  ) // Ensure iframe height is dynamic and fits the container
-                }}
+                dangerouslySetInnerHTML={{ __html: location.googleMapsLink }}
+                className="w-full h-full rounded-lg shadow-md"
               />
             </div>
           )}
 
-          {/* Photos Section */}
+          
+
           <div>
             <h2 className="text-2xl font-semibold mb-4">Photos</h2>
             <div className="grid grid-cols-2 gap-4">
-              <img
+                {/* Use the same image multiple times if you don't have more images in the database */}
+                <img
                 src={location.imageURL}
                 alt={`${location.name} 1`}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <img
+                className="w-64 h-64 object-cover rounded-lg"
+                />
+                <img
                 src={location.imageURL}
                 alt={`${location.name} 2`}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <img
+                className="w-64 h-64 object-cover rounded-lg"
+                />
+                <img
                 src={location.imageURL}
                 alt={`${location.name} 3`}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <img
+                className="w-64 h-64 object-cover rounded-lg"
+                />
+                <img
                 src={location.imageURL}
                 alt={`${location.name} 4`}
-                className="w-full h-40 object-cover rounded-lg"
-              />
+                className="w-64 h-64 object-cover rounded-lg"
+                />
             </div>
-          </div>
+            </div>
+
         </div>
       </div>
     </div>
