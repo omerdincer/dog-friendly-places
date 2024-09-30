@@ -40,7 +40,7 @@ const LocationDetail = () => {
           <img
             src={location.imageURL || "../components/materials/default.png"}
             alt={location.name}
-            className="w-full h-72 object-cover rounded-lg mb-6"
+            className="w-full h-96 object-cover rounded-lg mb-6"
           />
 
           {/* Location Name and Social Icons */}
@@ -61,10 +61,15 @@ const LocationDetail = () => {
 
           {/* Google Maps Link */}
           {location.googleMapsLink && (
-            <div className="mb-6">
+            <div className="mb-6 w-full">
               <div
-                dangerouslySetInnerHTML={{ __html: location.googleMapsLink }}
-                className="w-full h-64 rounded-lg shadow-md"
+                className="w-full"
+                dangerouslySetInnerHTML={{
+                  __html: location.googleMapsLink.replace(
+                    'height="450"',
+                    'height="100%"'
+                  ) // Ensure iframe height is dynamic and fits the container
+                }}
               />
             </div>
           )}
@@ -73,26 +78,25 @@ const LocationDetail = () => {
           <div>
             <h2 className="text-2xl font-semibold mb-4">Photos</h2>
             <div className="grid grid-cols-2 gap-4">
-              {/* Use the same image multiple times if you don't have more images in the database */}
               <img
                 src={location.imageURL}
                 alt={`${location.name} 1`}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-40 object-cover rounded-lg"
               />
               <img
                 src={location.imageURL}
                 alt={`${location.name} 2`}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-40 object-cover rounded-lg"
               />
               <img
                 src={location.imageURL}
                 alt={`${location.name} 3`}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-40 object-cover rounded-lg"
               />
               <img
                 src={location.imageURL}
                 alt={`${location.name} 4`}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-40 object-cover rounded-lg"
               />
             </div>
           </div>
