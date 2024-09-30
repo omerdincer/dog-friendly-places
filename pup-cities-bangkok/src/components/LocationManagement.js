@@ -49,6 +49,12 @@ const LocationManagement = () => {
     }
   };
 
+  // Validate if Google Maps link is correct
+  const isValidGoogleMapsIframe = (link) => {
+    const iframePattern = /<iframe.*?src="https:\/\/www\.google\.com\/maps\/embed?.*?".*?><\/iframe>/;
+    return iframePattern.test(link);
+  };
+
   // Compress and upload the image to Firebase Storage
   const uploadImage = async (file) => {
     const options = {
@@ -90,6 +96,12 @@ const LocationManagement = () => {
       return;
     }
 
+    // Validate Google Maps Link
+    if (!isValidGoogleMapsIframe(googleMapsLink)) {
+      alert('Please enter a valid Google Maps iframe link.');
+      return;
+    }
+
     try {
       setProgress(0); // Reset progress bar
       setProgressText('Started!'); // Show "Started!" text when button is clicked
@@ -105,7 +117,7 @@ const LocationManagement = () => {
         type,
         sponsored,
         imageURL, // Store the image URL in Firestore
-        googleMapsLink, // Store the Google Maps link in Firestore
+        googleMapsLink, // Store the Google Maps iframe link in Firestore
       });
 
       alert('Location added successfully!');
@@ -172,7 +184,7 @@ const LocationManagement = () => {
 
         <input
           type="text"
-          placeholder="Google Maps Link"
+          placeholder="Google Maps iframe Link"
           value={googleMapsLink}
           onChange={(e) => setGoogleMapsLink(e.target.value)}
           className="w-full mb-4 p-2 border rounded"
