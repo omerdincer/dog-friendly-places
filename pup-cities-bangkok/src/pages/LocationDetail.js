@@ -37,18 +37,11 @@ const LocationDetail = () => {
       <p className="text-lg mb-4">Type: {location.type}</p>
       <p className="text-lg mb-4">Neighborhood: {location.neighborhood}</p>
 
-      {/* Display the Google Maps link with a small visual */}
+      {/* Display the Google Maps iframe */}
       {location.googleMapsLink && (
-        <iframe
-          title="Google Maps"
-          src={location.googleMapsLink}
-          width="100%"
-          height="300"
-          className="rounded"
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
+        <div
+          dangerouslySetInnerHTML={{ __html: location.googleMapsLink }}
+        />
       )}
     </div>
   );
