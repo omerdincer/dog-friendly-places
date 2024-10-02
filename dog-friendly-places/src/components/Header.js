@@ -9,7 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth';  // Listen to auth state cha
 import { getDoc, doc } from 'firebase/firestore';  // Firestore functions
 
 // Import your logo image
-import Logo from '../components/materials/logo.png'; // Adjust this path based on where your logo is
+import Logo from './materials/logo.png'; // Adjust this path based on where your logo is
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -94,12 +94,12 @@ const Header = () => {
           {/* Logo */}
           <img
             src={Logo}
-            alt="Pup Cities Bangkok Logo"
+            alt="Dog Friendly Places Logo"
             className="h-10 object-contain" // Adjust the height as needed
           />
 
           {/* Title with LE PETIT COCHON font */}
-          <h1 className="text-2xl font-bold le-petit-cochon" style={{ color: '#e7e0d8' }}>Pup Cities Bangkok</h1> 
+          <h1 className="text-2xl font-bold le-petit-cochon" style={{ color: '#e7e0d8' }}>Dog Friendly Places</h1> 
         </div>
 
         {/* Hamburger Menu on the right */}
@@ -123,7 +123,7 @@ const Header = () => {
 
         {/* Logo at the top of the sidebar */}
         <div className="flex justify-start mb-6">
-          <img src={Logo} alt="Pup Cities Bangkok Logo" className="h-32 object-contain" />  {/* Adjust the height as needed */}
+          <img src={Logo} alt="Dog Friendly Places Logo" className="h-32 object-contain" />  {/* Adjust the height as needed */}
         </div>
 
         <ul className="space-y-6">
